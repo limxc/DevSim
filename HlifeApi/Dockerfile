@@ -11,10 +11,10 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["HlifeApi/HlifeApi.csproj", "HlifeApi/"]
-RUN dotnet restore "./HlifeApi/HlifeApi.csproj"
+COPY ["./HlifeApi.csproj", "."]
+RUN dotnet restore "./HlifeApi.csproj"
 COPY . .
-WORKDIR "/src/HlifeApi"
+WORKDIR "/src/."
 RUN dotnet build "./HlifeApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # 此阶段用于发布要复制到最终阶段的服务项目

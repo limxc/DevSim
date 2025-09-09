@@ -1,1 +1,9 @@
-﻿
+﻿version: '3.8'
+services:
+  hlifeapi:
+    build: .             
+    image: local/hlifeapi:latest
+    container_name: hlifeapi
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

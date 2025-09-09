@@ -1,0 +1,21 @@
+@HlifeApi_HostAddress = http://localhost:5144
+
+### Demo
+GET {{HlifeApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+### Query
+POST {{HlifeApi_HostAddress}}/query/
+Content-Type: application/json
+
+{
+  "key": "Íõ"
+}
+
+### Upload
+POST {{HlifeApi_HostAddress}}/upload/
+Content-Type: application/json
+
+{
+  "key": "Íõ"
+}

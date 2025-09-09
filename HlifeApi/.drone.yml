@@ -1,0 +1,62 @@
+﻿kind: pipeline
+type: docker
+name: build-and-run-local
+
+steps:
+  # 1. 编译 & 打包
+  - name: build
+    image: mcr.microsoft.com/dotnet/sdk:9.0
+    commands:
+      - dotnet restore
+      - dotnet publish -c Release -o out
+
+  # 2. 本地构建镜像（不推送任何仓库）
+  - name: docker-build
+    image: plugins/docker
+    settings:
+      dockerfile: Dockerfile
+      repo: local/webapi-demo          # 仅本地 tag
+      tags: latest
+      # 不指定 registry/auth -> 默认用宿主机本地 docker daemon
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock     # 重用宿主机 Docker
+
+  # 3. 本地运行（同一台宿主机）
+  - name: deploy-local
+    image: appleboy/drone-ssh
+    settings:
+      host: 127.0.0.1
+      port: 22
+      username: ubuntu
+      key:
+        from_secret: ssh_key            # 在 Drone UI 里添加
+      script:
+        - docker stop webapi-demo || true
+        - docker rm webapi-demo || true
+        - docker run -d --name webapi-demo -p 8080:8080 local/webapi-demo:latest
+    when:
+      branch: main
+
+  # 可选：清理旧镜像，保留最近 3 个版本
+  - name: prune-images
+    image: appleboy/drone-ssh
+    settings:
+      host: 127.0.0.1
+      port: 22
+      username: ubuntu
+      key:
+        from_secret: ssh_key
+      script:
+        - docker image prune -f --filter "label=local/webapi-demo" --filter "until=24h"
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
+trigger:
+  branch:
+    - main
+  event:
+    - push

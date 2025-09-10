@@ -29,5 +29,5 @@ steps:
 volumes:
 - name: dockersock
   host:
-    path: //./pipe/docker_engine  # 关键：映射宿主机 Docker 守护进程
+    path: //./pipe/docker_engine
 

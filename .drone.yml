@@ -1,8 +1,12 @@
-﻿# HlifeApi pipeline(windows下的docker desktop)
----
+﻿# HlifeApi pipeline(windows下的docker desktop) 
 kind: pipeline
-type: docker
+type: exec          # 关键：用宿主机 runner，而不是 docker runner
 name: hlifeapi
+
+platform:
+  os: windows       # 告诉 Drone 这是 Windows 宿主机
+  arch: amd64
+
 trigger:
   branch:
     - main
@@ -11,23 +15,10 @@ trigger:
 
 steps:
 - name: 构建
-  image: docker:20.10-cli   
-  volumes:
-    - name: dockersock
-      path: /var/run/docker.sock  
   commands:
-    - docker compose -f ./HlifeApi/docker-compose.yml build 
+    - docker compose -f HlifeApi\docker-compose.yml build   # Windows 路径反斜杠
 
 - name: 部署
-  image: docker:20.10-cli  
-  volumes:
-    - name: dockersock
-      path: /var/run/docker.sock  
-  commands: 
-    - docker compose down 
-    - docker compose -f ./HlifeApi/docker-compose.yml up -d
-volumes:
-- name: dockersock
-  host:
-    path: //./pipe/docker_engine
-
+  commands:
+    - docker compose -f HlifeApi\docker-compose.yml down
+    - docker compose -f HlifeApi\docker-compose.yml up -d

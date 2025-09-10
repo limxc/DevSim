@@ -4,5 +4,5 @@
     image: local/hlifeapi:latest
     container_name: hlifeapi
     ports:
-      - "10001:8080"
+      - "7010:8080"
     restart: unless-stopped

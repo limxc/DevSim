@@ -1,7 +1,13 @@
-﻿# windows下的docker desktop
+﻿# HlifeApi pipeline(windows下的docker desktop)
+---
 kind: pipeline
 type: docker
 name: hlifeapi
+trigger:
+  branch:
+    - main
+  event:
+    - push
 
 steps:
 - name: 构建
@@ -20,14 +26,8 @@ steps:
   commands: 
     - docker compose down 
     - docker compose -f ./HlifeApi/docker-compose.yml up -d
- 
 volumes:
 - name: dockersock
   host:
     path: //./pipe/docker_engine  # 关键：映射宿主机 Docker 守护进程
 
-trigger:
-  branch:
-    - main
-  event:
-    - push

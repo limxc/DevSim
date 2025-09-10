@@ -74,7 +74,7 @@ app.Use(async (ctx, next) =>
             respMs.Position = 0;
             await respMs.CopyToAsync(originalRespBody);
 
-            logger.Fatal("{Req} {ReqBody} | {RespStatus} {RespBody}",
+            logger.Information("{Req} {ReqBody} | {RespStatus} {RespBody}",
                     ctx.Request.Method, reqJson,
                     ctx.Response.StatusCode, respJson);
         }
@@ -84,6 +84,6 @@ app.Use(async (ctx, next) =>
 
 app.UseSerilogUi(options => options.WithRoutePrefix("logs"));
 
-logger.Fatal("Api starting...");
+logger.Information("Api starting...");
 
 app.Run();

@@ -1,6 +1,6 @@
 ﻿# HlifeApi pipeline(windows下的docker desktop) 
 kind: pipeline
-type: exec          # 关键：用宿主机 runner，而不是 docker runner
+type: exec
 name: hlifeapi
 
 platform:
@@ -9,16 +9,21 @@ platform:
 
 trigger:
   branch:
-    - main
+    - master
   event:
     - push
 
 steps:
 - name: 构建
   commands:
-    - docker compose -f HlifeApi\docker-compose.yml build   # Windows 路径反斜杠
+    - docker compose -f .\HlifeApi\docker-compose.yml build   # Windows 路径反斜杠
 
 - name: 部署
   commands:
-    - docker compose -f HlifeApi\docker-compose.yml down
-    - docker compose -f HlifeApi\docker-compose.yml up -d
+    - docker compose -f .\HlifeApi\docker-compose.yml down
+    - docker compose -f .\HlifeApi\docker-compose.yml up -d
+ 
+
+
+
+

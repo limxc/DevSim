@@ -1,6 +1,6 @@
 ﻿namespace Query
 {
-    internal sealed class Endpoint : Endpoint<Request, Response>
+    internal sealed class Endpoint : Endpoint<Request, Archive[]>
     {
         public override void Configure()
         {
@@ -16,9 +16,9 @@
             if (string.IsNullOrWhiteSpace(key))
                 rst = Archive.Mock.Generate(10).ToList();
             else
-                rst = Archive.Mock.Generate(10000).Where(p => p.Name.Contains(key) || p.CardId.Contains(key)).Take(20).ToList();
+                rst = Archive.Mock.Generate(10000).Where(p => p.Name.Contains(key) || p.CardId.Contains(key)).Take(10).ToList();
 
-            Response.Archives = rst;
+            Response = rst.ToArray();
         }
     }
 }

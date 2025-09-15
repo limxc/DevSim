@@ -11,7 +11,7 @@ namespace HlifeApi
         {
             try
             {
-                if (ctx.OperationDescription.Path == "/query")
+                if (ctx.OperationDescription.Path.StartsWith("/query"))
                 {
                     ctx.OperationDescription.Operation.RequestBody.Content["application/json"].Example =
                         Newtonsoft.Json.Linq.JToken.FromObject(new Query.Request() { Key = "王" });
@@ -24,7 +24,7 @@ namespace HlifeApi
 
             try
             {
-                if (ctx.OperationDescription.Path == "/upload")
+                if (ctx.OperationDescription.Path.StartsWith("/upload"))
                 {
                     ctx.OperationDescription.Operation.RequestBody.Content["application/json"].Example =
                         Newtonsoft.Json.Linq.JToken.FromObject(Upload.Request.Mock());

@@ -1,6 +1,6 @@
 ﻿namespace HlifeApi.Features.Demo
 {
-    internal sealed class Endpoint : EndpointWithoutRequest<Results<Ok<WeatherForecast[]>,
+    internal sealed class Endpoint_1 : EndpointWithoutRequest<Results<Ok<WeatherForecast[]>,
                                            NotFound,
                                            ProblemDetails>>
     {
@@ -12,45 +12,56 @@
         public required CountService CountService { get; set; }
 
         public override void Configure()
-        {
-            Get("weatherforecast");
-            AllowAnonymous();
-        }
+        { Get("demo1"); AllowAnonymous(); }
 
-        public override async Task<Results<Ok<WeatherForecast[]>, NotFound, ProblemDetails>> ExecuteAsync(CancellationToken ct)
+        public override async Task<Results<Ok<WeatherForecast[]>, NotFound, ProblemDetails>>
+        ExecuteAsync(CancellationToken ct)
         {
             await Task.CompletedTask; //simulate async work
 
-            //condition for a not found response
-            if (CountService.Count % 3 == 1)
-                return TypedResults.NotFound();
+            var count = CountService.GetCount(); CountService.AddCount();
+
+            //condition for a not found response if (count % 3 == 1) return TypedResults.NotFound();
 
             //condition for a problem details response
 
-            if (CountService.Count % 3 == 2)
+            if (count % 3 == 2)
             {
-                AddError("sim error");
-                return new FastEndpoints.ProblemDetails(ValidationFailures);
+                AddError("sim error"); return new
+            FastEndpoints.ProblemDetails(ValidationFailures);
             }
 
-            var forecast = Enumerable.Range(1, 5).Select(index =>
-            new WeatherForecast
-            (
-                DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                Random.Shared.Next(-20, 55),
-                summaries[Random.Shared.Next(summaries.Length)]
-            ))
-            .ToArray();
-
-            CountService.Count++;
+            var forecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast(
+            DateOnly.FromDateTime(DateTime.Now.AddDays(index)), Random.Shared.Next(-20, 55),
+            summaries[Random.Shared.Next(summaries.Length)])).ToArray();
 
             // 200 ok response with a DTO
             return TypedResults.Ok(forecast);
         }
     }
 
-    internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+    internal sealed class Endpoint_2 : Ep.Req<Request>.Res<Results<Ok<WeatherForecast[]>, ProblemDetails>>
     {
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        public override void Configure()
+        {
+            Post("demo2");
+            AllowAnonymous();
+        }
+
+        public override async Task<Results<Ok<WeatherForecast[]>, ProblemDetails>> ExecuteAsync(Request req, CancellationToken ct)
+        {
+            await Task.CompletedTask;
+            if (DateTime.Now.Second % 3 == 1)
+            {
+                AddError("sim error");
+                return new ProblemDetails(ValidationFailures);
+            }
+
+            return TypedResults.Ok(new WeatherForecast[]
+            {
+                new WeatherForecast(new DateOnly(2000,1,1), 25, ""),
+                new WeatherForecast(new DateOnly(2001,2,2), 33, ""),
+            });
+        }
     }
 }

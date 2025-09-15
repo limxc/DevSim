@@ -3,6 +3,7 @@ using Serilog;
 using Serilog.Ui.Core.Extensions;
 using Serilog.Ui.SqliteDataProvider.Extensions;
 using Serilog.Ui.Web.Extensions;
+using System.Text.Json.Serialization;
 
 SQLitePCL.Batteries_V2.Init();
 
@@ -30,14 +31,33 @@ builder.Services
     .AddFastEndpoints()
     .SwaggerDocument(opt =>
     {
-        opt.DocumentSettings = s => s.OperationProcessors.Add(new DefValueProcessor());
+        opt.DocumentSettings = s =>
+        {
+            s.OperationProcessors.Add(new DefValueProcessor());
+            s.DocumentName = "д╛хо";
+            s.Version = "v0";
+        };
+    })
+    .SwaggerDocument(opt =>
+    {
+        opt.MaxEndpointVersion = 1;
+        opt.DocumentSettings = s =>
+        {
+            s.OperationProcessors.Add(new DefValueProcessor());
+            s.DocumentName = "v1";
+            s.Version = "v1";
+        };
     });
 
 // Add services to the container.
 builder.Services.AddSingleton<CountService>();
 
 var app = builder.Build();
-app.UseFastEndpoints()
+app.UseFastEndpoints(c =>
+    {
+        c.Versioning.Prefix = "v";
+        c.Versioning.DefaultVersion = 0;
+    })
     .UseSwaggerGen();
 // Configure the HTTP request pipeline.
 

@@ -6,7 +6,6 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 
-
 # 此阶段用于生成服务项目
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release

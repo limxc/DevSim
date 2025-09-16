@@ -1,4 +1,4 @@
-@page "/apilogs"
+ï»¿@page "/apilog"
 @using System.Text.Json
 @using ApiLog.Models
 @using ApiLog.Services
@@ -7,24 +7,24 @@
 @inject ApiLogService LogService
 
 <PageTitle>API Logs Viewer</PageTitle>
- 
+
 <div class="api-log-viewer">
     <div class="filters">
         <div class="filter-group">
-            <label>¿ªÊ¼Ê±¼ä:</label>
+            <label>å¼€å§‹æ—¶é—´:</label>
             <input type="datetime-local" @bind="_fromDate" min="2025-01-01T00:00" max="2030-01-01T00:00" />
         </div>
         <div class="filter-group">
-            <label>½áÊøÊ±¼ä:</label>
+            <label>ç»“æŸæ—¶é—´:</label>
             <input type="datetime-local" @bind="_toDate" min="2025-01-01T00:00" max="2030-01-01T00:00" />
         </div>
         <div class="filter-group">
-            <label>É¸Ñ¡(Route):</label>
+            <label>ç­›é€‰(Route):</label>
             <input type="text" @bind="_routeFilter" @onblur="RefreshLogs" />
         </div>
-        <button @onclick="RefreshLogs">Ë¢ĞÂ</button>
-        <button @onclick="DeleteLogs">É¾³ı¹ıÂËÊı¾İ</button>
-        <button @onclick="DeleteAllLogs">É¾³ıÈ«²¿Êı¾İ</button>
+        <button @onclick="RefreshLogs">åˆ·æ–°</button>
+        <button @onclick="DeleteLogs">åˆ é™¤è¿‡æ»¤æ•°æ®</button>
+        <button @onclick="DeleteAllLogs">åˆ é™¤å…¨éƒ¨æ•°æ®</button>
     </div>
 
     <div class="log-container">
@@ -52,7 +52,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <h3>Request</h3>
                     <button @onclick="() => _isCollapsedRequest = !_isCollapsedRequest">
-                        @(_isCollapsedRequest ? "Õ¹¿ª" : "ÕÛµş")
+                        @(_isCollapsedRequest ? "å±•å¼€" : "æŠ˜å ")
                     </button>
                 </div>
                 <div class="request-section">
@@ -71,7 +71,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <h3>Response</h3>
                     <button @onclick="() => _isCollapsedResponse = !_isCollapsedResponse">
-                        @(_isCollapsedResponse ? "Õ¹¿ª" : "ÕÛµş")
+                        @(_isCollapsedResponse ? "å±•å¼€" : "æŠ˜å ")
                     </button>
                 </div>
                 <div class="response-section">
@@ -170,8 +170,7 @@
         display: flex;
         flex-direction: column;
         height: 100vh;
-        padding: 1rem;
-        font-family: system-ui, -apple-system, sans-serif;
+        padding: 1rem; 
     }
 
     .filters {
@@ -251,8 +250,7 @@
         }
 
     .route {
-        flex: 1;
-        font-family: monospace;
+        flex: 1; 
     }
 
     .log-subheader {
@@ -290,8 +288,7 @@
         background: #f8f9fa;
         padding: 1rem;
         border-radius: 4px;
-        overflow-x: auto;
-        font-family: Consolas, monospace;
+        overflow-x: auto; 
         font-size: 0.9rem;
         white-space: pre-wrap;
     }

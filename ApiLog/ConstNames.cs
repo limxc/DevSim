@@ -8,9 +8,8 @@ namespace ApiLog
 {
     internal static class ConstNames
     {
-        internal const string RoutePrefix = "/apilogs";
         internal const string DBPath = "DB/ApiLogs.db";
-        internal static readonly string[] IgnorePostfixs = [".css", ".js", ".json", ".map"];
+        internal static readonly string[] IgnorePostfixs = [".css", ".js", ".json", ".map", ".png", ".ico"];
         internal static readonly string[] IgnorePrefixs = ["/_", "/swagger", "/apilog", ".map"];
     }
 }

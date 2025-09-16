@@ -3,16 +3,15 @@ using ApiLog.Middleware;
 using ApiLog.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace ApiLog.Extensions;
 
 public static class ServiceExtension
 {
-    // 在 builder 阶段注册服务
     public static IServiceCollection AddApiLog(this IServiceCollection services, Action<ApiLogViewerOptions>? configureOptions = null)
     {
         services.AddRazorComponents().AddInteractiveServerComponents();
+        services.AddAntiforgery();
 
         services.AddSingleton<ApiLogService>(sp => new ApiLogService(ConstNames.DBPath));
 
@@ -28,7 +27,6 @@ public static class ServiceExtension
         return services;
     }
 
-    // 在 app 阶段挂中间件和页面
     public static WebApplication UseApiLog(this WebApplication app)
     {
         app.UseAntiforgery();
@@ -37,8 +35,8 @@ public static class ServiceExtension
 
         app.MapRazorComponents<App>().AddInteractiveServerRenderMode().AllowAnonymous();
 
-        //app.MapStaticAssets();
-        app.UseStaticFiles();
+        app.MapStaticAssets();
+        //app.UseStaticFiles();
 
         return app;
     }

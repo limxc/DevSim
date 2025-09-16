@@ -5,9 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<StaticWebAssetBasePath>apiLog</StaticWebAssetBasePath>
+		<StaticWebAssetBasePath>apiLog</StaticWebAssetBasePath> 
 	</PropertyGroup>
-
 
 	<ItemGroup>
 		<SupportedPlatform Include="browser" />

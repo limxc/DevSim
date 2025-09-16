@@ -4,7 +4,7 @@ type: exec
 name: hlifeapi
 
 platform:
-  os: windows       # 告诉 Drone 这是 Windows 宿主机
+  os: windows 
   arch: amd64
 
 trigger:
@@ -14,6 +14,13 @@ trigger:
     - push
 
 steps:
+- name: 设置代理 
+  commands: 
+    - git config --global http.proxy socks5://192.168.50.3:1070
+    - git config --global https.proxy socks5://192.168.50.3:1070
+    - git config --global --get http.proxy
+    - git config --global --get https.proxy
+
 - name: 构建
   commands:
     - docker compose -f .\HlifeApi\docker-compose.yml build   # Windows 路径反斜杠

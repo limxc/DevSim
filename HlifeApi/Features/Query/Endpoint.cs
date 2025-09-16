@@ -14,6 +14,8 @@ namespace Query
 
         public override async Task HandleAsync(Request r, CancellationToken c)
         {
+            await Task.CompletedTask;
+
             var key = r.Key;
 
             List<Archive> rst;
@@ -54,7 +56,6 @@ namespace Query
             }
 
             //condition for a problem details response
-
             if (count % 3 == 2)
             {
                 AddError("sim error");

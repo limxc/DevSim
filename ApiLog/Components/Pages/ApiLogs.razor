@@ -1,0 +1,318 @@
+@page "/apilogs"
+@using System.Text.Json
+@using ApiLog.Models
+@using ApiLog.Services
+@using Microsoft.AspNetCore.Components.Web
+
+@inject ApiLogService LogService
+
+<PageTitle>API Logs Viewer</PageTitle>
+ 
+<div class="api-log-viewer">
+    <div class="filters">
+        <div class="filter-group">
+            <label>开始时间:</label>
+            <input type="datetime-local" @bind="_fromDate" min="2025-01-01T00:00" max="2030-01-01T00:00" />
+        </div>
+        <div class="filter-group">
+            <label>结束时间:</label>
+            <input type="datetime-local" @bind="_toDate" min="2025-01-01T00:00" max="2030-01-01T00:00" />
+        </div>
+        <div class="filter-group">
+            <label>筛选(Route):</label>
+            <input type="text" @bind="_routeFilter" @onblur="RefreshLogs" />
+        </div>
+        <button @onclick="RefreshLogs">刷新</button>
+        <button @onclick="DeleteLogs">删除过滤数据</button>
+        <button @onclick="DeleteAllLogs">删除全部数据</button>
+    </div>
+
+    <div class="log-container">
+        <div class="log-list">
+            @foreach (var log in _logs)
+            {
+                <div class="log-item @( _selectedLog == log ? "selected" : "")"
+                     @onclick="() => _selectedLog = log">
+                    <div class="log-header">
+                        <span class="method @log.Method.ToLower()">@log.Method</span>
+                        <span class="route">@log.Route</span>
+                        <span class="status-@log.StatusCode">@log.StatusCode</span>
+                    </div>
+                    <div class="log-subheader">
+                        <span class="timestamp">@log.Timestamp.ToLocalTime().ToString("g")</span>
+                        <span class="duration">@log.Duration.TotalMilliseconds.ToString("F1")ms</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (_selectedLog != null)
+        {
+            <div class="log-details">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h3>Request</h3>
+                    <button @onclick="() => _isCollapsedRequest = !_isCollapsedRequest">
+                        @(_isCollapsedRequest ? "展开" : "折叠")
+                    </button>
+                </div>
+                <div class="request-section">
+                    <div style="@( _isCollapsedRequest ? "display:none" : "" )">
+                        @if (_selectedLog.HasJsonRequest)
+                        {
+                            <pre>@FormatJson(_selectedLog.RequestBody)</pre>
+                        }
+                        else
+                        {
+                            <pre>@_selectedLog.RequestBody</pre>
+                        }
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h3>Response</h3>
+                    <button @onclick="() => _isCollapsedResponse = !_isCollapsedResponse">
+                        @(_isCollapsedResponse ? "展开" : "折叠")
+                    </button>
+                </div>
+                <div class="response-section">
+                    <div style="@( _isCollapsedResponse ? "display:none" : "" )">
+                        @if (_selectedLog.HasJsonResponse)
+                        {
+                            <pre>@FormatJson(_selectedLog.ResponseBody)</pre>
+                        }
+                        else
+                        {
+                            <pre>@_selectedLog.ResponseBody</pre>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+ 
+@code {
+    private bool _isCollapsedRequest = false;
+    private bool _isCollapsedResponse = false;
+    private IEnumerable<LogContext> _logs = Array.Empty<LogContext>();
+    private DateTime? _fromDate;
+    private DateTime? _toDate;
+    private string _routeFilter = string.Empty;
+    private LogContext? _selectedLog;
+    private JsonSerializerOptions _options = new JsonSerializerOptions
+    {
+        WriteIndented = true,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    }; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshLogs();
+    }
+
+    private async Task RefreshLogs()
+    {
+        try 
+        {
+            _logs = LogService.GetLogs(_fromDate, _toDate, _routeFilter);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error refreshing logs: {ex.Message}");
+        }
+        await Task.CompletedTask;
+    }
+
+    private string FormatJson(string json)
+    {
+        try
+        { 
+            var obj = JsonSerializer.Deserialize<dynamic>(json);
+            return JsonSerializer.Serialize(obj, _options);
+        }
+        catch
+        {
+            return json;
+        }
+    }
+
+    private async Task DeleteLogs()
+    {
+        try 
+        {
+            LogService.DeleteLogs(_fromDate, _toDate, _routeFilter);
+            await RefreshLogs();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting logs: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteAllLogs()
+    {
+        try 
+        {
+            LogService.DeleteAll();
+            await RefreshLogs();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting all logs: {ex.Message}");
+        }
+    }
+}
+
+
+<style>
+    .api-log-viewer {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        padding: 1rem;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        align-items: center;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .log-container {
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .log-list {
+        flex: 0 0 400px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .log-item {
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+    }
+
+        .log-item:hover {
+            background: #f5f5f5;
+        }
+
+        .log-item.selected {
+            background: #e3f2fd;
+        }
+
+    .log-header {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.25rem;
+    }
+
+    .method {
+        padding: 0.25rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+        .method.get {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .method.post {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .method.put {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .method.delete {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+    .route {
+        flex: 1;
+        font-family: monospace;
+    }
+
+    .log-subheader {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .status-200 {
+        color: #2e7d32;
+    }
+
+    .status-400, .status-404 {
+        color: #ef6c00;
+    }
+
+    .status-500 {
+        color: #c62828;
+    }
+
+    .log-details {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .request-section, .response-section {
+        margin-bottom: 2rem; 
+    }
+
+    pre {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-family: Consolas, monospace;
+        font-size: 0.9rem;
+        white-space: pre-wrap;
+    }
+
+    button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        background: #1976d2;
+        color: white;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background: #1565c0;
+        }
+
+    input {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+</style>

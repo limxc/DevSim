@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace HlifeApi
 {
-    public class DefValueProcessor : IOperationProcessor
+    public class SwaggerDefaultValueProcessor : IOperationProcessor
     {
         public bool Process(OperationProcessorContext ctx)
         {

@@ -13,6 +13,8 @@ namespace Upload
 
         public override async Task HandleAsync(Request r, CancellationToken c)
         {
+            await Task.CompletedTask;
+
             Response.State = true;
         }
     }
@@ -30,6 +32,8 @@ namespace Upload
 
         public override async Task<Results<Ok<Response>, ProblemDetails>> ExecuteAsync(Request r, CancellationToken c)
         {
+            await Task.CompletedTask;
+
             var count = CountService.GetCount();
             CountService.AddCount();
 

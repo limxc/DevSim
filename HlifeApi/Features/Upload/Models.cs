@@ -43,7 +43,7 @@ namespace Upload
             var jsonPath = Path.Combine(AppContext.BaseDirectory, "Files", "upload-bmd.json");
             var json = File.ReadAllText(jsonPath);
             var req = JsonConvert.DeserializeObject<Request>(json);
-            return req;
+            return req ?? new Request();
         }
     }
 

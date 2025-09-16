@@ -1,6 +1,8 @@
 ﻿services:
   hlifeapi:
-    build: .             
+    build: 
+      context: .. 
+      dockerfile: .\HlifeApi\Dockerfile
     image: local/hlifeapi:latest
     container_name: hlifeapi
     ports:

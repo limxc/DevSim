@@ -5,6 +5,7 @@
 @using Microsoft.AspNetCore.Components.Web
 
 @inject ApiLogService LogService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>API Logs Viewer</PageTitle>
 
@@ -51,9 +52,13 @@
             <div class="log-details">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <h3>Request</h3>
-                    <button @onclick="() => _isCollapsedRequest = !_isCollapsedRequest">
-                        @(_isCollapsedRequest ? "展开" : "折叠")
-                    </button>
+                    <div>
+                        <button @onclick="() => CopyToClipboard(_selectedLog.HasJsonRequest ? FormatJson(_selectedLog.RequestBody) : _selectedLog.RequestBody)" style="margin-right: 8px;">复制</button>
+                        <button 
+                            @onclick="() => _isCollapsedRequest = !_isCollapsedRequest">
+                            @(_isCollapsedRequest ? "展开" : "折叠")
+                        </button> 
+                    </div> 
                 </div>
                 <div class="request-section">
                     <div style="@( _isCollapsedRequest ? "display:none" : "" )">
@@ -70,10 +75,14 @@
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <h3>Response</h3>
-                    <button @onclick="() => _isCollapsedResponse = !_isCollapsedResponse">
-                        @(_isCollapsedResponse ? "展开" : "折叠")
-                    </button>
-                </div>
+                    <div>
+                        <button @onclick="() => CopyToClipboard(_selectedLog.HasJsonResponse ? FormatJson(_selectedLog.ResponseBody) : _selectedLog.ResponseBody)" style="margin-right: 8px;">复制</button>
+                        <button 
+                            @onclick="() => _isCollapsedResponse = !_isCollapsedResponse">
+                            @(_isCollapsedResponse ? "展开" : "折叠")
+                        </button> 
+                    </div>
+                </div> 
                 <div class="response-section">
                     <div style="@( _isCollapsedResponse ? "display:none" : "" )">
                         @if (_selectedLog.HasJsonResponse)
@@ -162,6 +171,21 @@
             Console.WriteLine($"Error deleting all logs: {ex.Message}");
         }
     }
+    private async Task CopyToClipboard(string text)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text); 
+            Console.WriteLine($"复制成功: {(text.Length <100 ? text: text.Substring(0, 100)+"...")}");
+            await JSRuntime.InvokeVoidAsync("console.log", $"复制成功: {(text.Length < 100 ? text : text.Substring(0, 100) + "...")}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"复制失败: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("console.log", $"复制失败: {ex.Message}");
+        }
+    }
+
 }
 
 

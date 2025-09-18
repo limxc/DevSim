@@ -8,3 +8,8 @@
     ports:
       - "7010:8080"
     restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
